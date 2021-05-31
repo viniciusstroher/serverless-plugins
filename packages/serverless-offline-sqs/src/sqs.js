@@ -50,7 +50,8 @@ class SQS {
 
   async _getQueueUrl(queueName) {
     try {
-      return await this.client.getQueueUrl({QueueName: queueName}).promise();
+      let {QueueUrl} = await this.client.getQueueUrl({QueueName: queueName}).promise();
+      return QueueUrl
     } catch (err) {
       await delay(10000);
       return this._getQueueUrl(queueName);
@@ -64,7 +65,9 @@ class SQS {
 
     if (this.options.autoCreate) await this._createQueue(sqsEvent);
 
-    const {QueueUrl} = await this.client.getQueueUrl({QueueName: queueName}).promise();
+    let {QueueUrl} = await this.client.getQueueUrl({QueueName: queueName}).promise();
+    
+    QueueUrl = QueueUrl.replace("localhost","sqs")
 
     const job = async () => {
       const {Messages} = await this.client
